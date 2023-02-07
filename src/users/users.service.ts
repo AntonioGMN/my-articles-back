@@ -17,6 +17,7 @@ export class UsersService {
   }
 
   async create(data: CreateUserDto): Promise<ResponseDto> {
+    console.log(data);
     const hashPassword = await bcrypt.hashSync(data.password, 8);
     const user = new Users();
 

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from 'src/auth/auth.service';
+import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
 import { ResponseDto } from 'src/dto/response.dto';
 import { CreateUserDto } from './dto/users.create.dto';
 import { UsersService } from './users.service';
@@ -19,13 +20,14 @@ export class UsersController {
     private authService: AuthService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getAll() {
     console.log(process.env.JWT_SECRETE);
     return this.userService.findAll();
   }
 
-  @Post()
+  @Post('sign-up')
   async create(@Body() data: CreateUserDto): Promise<ResponseDto> {
     return this.userService.create(data);
   }
