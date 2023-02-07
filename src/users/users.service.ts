@@ -17,7 +17,7 @@ export class UsersService {
   }
 
   async create(data: CreateUserDto): Promise<ResponseDto> {
-    const hashPassword = bcrypt.hashSync(data.password);
+    const hashPassword = await bcrypt.hashSync(data.password, 8);
     const user = new Users();
 
     user.email = data.email;
@@ -41,5 +41,7 @@ export class UsersService {
       });
   }
 
-  async login(data: CreateUserDto): Promise<ResponseDto> {}
+  async findOne(email: string): Promise<Users | undefined> {
+    return this.usersRepository.findOne({ where: { email: email } });
+  }
 }
