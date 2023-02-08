@@ -17,7 +17,6 @@ export class UsersService {
   }
 
   async create(data: CreateUserDto): Promise<ResponseDto> {
-    console.log(data);
     const hashPassword = await bcrypt.hashSync(data.password, 8);
     const user = new Users();
 
@@ -34,7 +33,6 @@ export class UsersService {
         };
       })
       .catch((error) => {
-        //console.log(error);
         return <ResponseDto>{
           status: false,
           mensage: 'deu errror',
@@ -44,5 +42,9 @@ export class UsersService {
 
   async findOne(email: string): Promise<Users | undefined> {
     return this.usersRepository.findOne({ where: { email: email } });
+  }
+
+  async delete(userId: number): Promise<void> {
+    await this.usersRepository.delete(userId);
   }
 }

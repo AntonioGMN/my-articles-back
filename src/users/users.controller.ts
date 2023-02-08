@@ -5,11 +5,15 @@ import {
   Post,
   UseGuards,
   Request,
+  HttpStatus,
+  Res,
+  Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from 'src/auth/auth.service';
-import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
-import { ResponseDto } from 'src/dto/response.dto';
+import { get } from 'http';
+import { AuthService } from '../auth/auth.service';
+import { JwtAuthGuard } from '../auth/jwt.auth.guard';
+import { ResponseDto } from '../dto/response.dto';
 import { CreateUserDto } from './dto/users.create.dto';
 import { UsersService } from './users.service';
 
@@ -20,10 +24,8 @@ export class UsersController {
     private authService: AuthService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   async getAll() {
-    console.log(process.env.JWT_SECRETE);
     return this.userService.findAll();
   }
 
@@ -34,7 +36,15 @@ export class UsersController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(@Request() req, @Res() res) {
+    const token = await this.authService.login(req.user);
+    return res.status(HttpStatus.OK).send(token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  async delete(@Request() req) {
+    const { userId } = req.user;
+    return await this.userService.delete(userId);
   }
 }
