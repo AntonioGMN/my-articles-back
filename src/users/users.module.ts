@@ -10,6 +10,6 @@ import { UniqueEmail } from './validations/uniqueEmail';
   imports: [DatabaseModule, forwardRef(() => AuthModule)],
   controllers: [UsersController],
   providers: [...usersProviders, UniqueEmail, UsersService],
-  exports: [UsersService, UniqueEmail],
+  exports: [UsersService],
 })
 export class UsersModule {}
