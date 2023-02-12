@@ -15,6 +15,6 @@ export class Users {
   @Column({ length: 100 })
   password: string;
 
-  @OneToMany(() => Articles, (article) => article.user)
+  @OneToMany(() => Articles, (Articles) => Articles.user)
   articles: Articles[];
 }

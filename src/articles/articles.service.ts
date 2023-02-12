@@ -15,22 +15,7 @@ export class ArticlesService {
     private userService: UsersService,
   ) {}
 
-  async get() {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto('https://blog.rocketseat.com.br/');
-
-    await page.$eval('header', (h) => h.remove());
-    await page.$eval('footer', (h) => h.remove());
-
-    const hrefs = await page.$$eval('a', (as) => as.map((a) => a.href));
-
-    await browser.close();
-
-    return hrefs;
-  }
-
-  async getByUserId(userId) {
+  async getByUserId(userId: number) {
     try {
       const articles = await this.articlesRepository.find({
         relations: { user: true },
@@ -86,6 +71,56 @@ export class ArticlesService {
         status: true,
         mensage: 'create',
       };
+    } catch (err) {
+      return <ResponseDto>{
+        status: false,
+        mensage: err,
+      };
+    }
+  }
+
+  async crawler(url: string) {
+    try {
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.goto(url);
+
+      await page.$eval('header', (h) => h.remove());
+      await page.$eval('footer', (h) => h.remove());
+
+      let links = await page.$$eval('article a', (as) => as.map((a) => a.href));
+      if (links.length === 0)
+        links = await page.$$eval('h1 a', (as) => as.map((a) => a.href));
+
+      links = links.filter((x, i) => links.indexOf(x) === i);
+      browser.close();
+
+      return links;
+    } catch (err) {}
+  }
+
+  async postCrawler({ userEmail, url }) {
+    try {
+      const links = await this.crawler(url);
+
+      const articles = await Promise.all(
+        links.map(async (l) => {
+          console.log(l);
+          const { title } = await urlMetadata(l);
+
+          return { url: l, title };
+        }),
+      );
+
+      const user = await this.userService.findOne(userEmail);
+
+      await Promise.all(
+        articles.map(async (ar) => {
+          await this.articlesRepository.save({ ...ar, user });
+        }),
+      );
+
+      return;
     } catch (err) {
       return <ResponseDto>{
         status: false,

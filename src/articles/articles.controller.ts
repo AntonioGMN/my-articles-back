@@ -7,7 +7,6 @@ import {
   Put,
   Body,
 } from '@nestjs/common';
-import { constants } from 'buffer';
 import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
 import { ArticlesService } from './articles.service';
 import { CreateArticlesDto } from './dto/articles.create.dto';
@@ -37,5 +36,13 @@ export class ArticlesController {
   async update(@Body() body: CreateArticlesDto) {
     console.log('incial article ', body);
     return this.articlesService.update(body);
+  }
+
+  @Post('/crawler')
+  async crawler(@Req() req) {
+    return await this.articlesService.postCrawler({
+      userEmail: req.user.email,
+      url: req.body.url,
+    });
   }
 }
