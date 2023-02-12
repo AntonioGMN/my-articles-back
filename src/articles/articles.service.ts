@@ -1,16 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import puppeteer from 'puppeteer';
 import { ResponseDto } from 'src/dto/response.dto';
 import { Repository } from 'typeorm';
 import { CreateArticlesDto } from './dto/articles.create.dto';
 import { Articles } from './articles.entity';
 import urlMetadata from 'url-metadata';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     @Inject('ARTICLES_REPOSITORY')
     private articlesRepository: Repository<Articles>,
+    private userService: UsersService,
   ) {}
 
   async get() {
@@ -28,10 +30,13 @@ export class ArticlesService {
     return hrefs;
   }
 
-  async getAll() {
+  async getByUserId(userId) {
     try {
-      const articles = await this.articlesRepository.find();
-      console.log('geting: ', articles);
+      const articles = await this.articlesRepository.find({
+        relations: { user: true },
+        where: { user: { id: userId } },
+      });
+      console.log(articles);
       const articlesWithMetaDates = Promise.all(
         articles.map(async (art) => {
           const { image } = await urlMetadata(art.url);
@@ -49,16 +54,39 @@ export class ArticlesService {
 
   async create(article: CreateArticlesDto): Promise<ResponseDto> {
     try {
-      console.log('create: ', article);
+      console.log(article);
+      const user = await this.userService.findOne(article.userEmail);
 
-      const r = await this.articlesRepository.save(article);
+      delete article.userEmail;
+      const r = await this.articlesRepository.save({ ...article, user });
       console.log(r);
+
       return <ResponseDto>{
         status: true,
         mensage: 'create',
       };
     } catch (err) {
       console.log(err);
+
+      return <ResponseDto>{
+        status: false,
+        mensage: err,
+      };
+    }
+  }
+
+  async update(article: CreateArticlesDto): Promise<ResponseDto> {
+    try {
+      const response = await this.articlesRepository.update(
+        article.id,
+        article,
+      );
+      console.log(response);
+      return <ResponseDto>{
+        status: true,
+        mensage: 'create',
+      };
+    } catch (err) {
       return <ResponseDto>{
         status: false,
         mensage: err,
