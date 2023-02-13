@@ -105,7 +105,6 @@ export class ArticlesService {
 
       const articles = await Promise.all(
         links.map(async (l) => {
-          console.log(l);
           const { title } = await urlMetadata(l);
 
           return { url: l, title };

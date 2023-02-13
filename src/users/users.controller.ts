@@ -15,7 +15,6 @@ import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { ResponseDto } from '../dto/response.dto';
 import { CreateUserDto } from './dto/users.create.dto';
 import { UsersService } from './users.service';
-import { LoginDto } from 'src/auth/dto/login.dto';
 
 @Controller('users')
 export class UsersController {
@@ -42,9 +41,9 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete()
+  @Delete('logout')
   async delete(@Request() req) {
     const { userId } = req.user;
-    return await this.userService.delete(userId);
+    return await this.authService.logout(userId);
   }
 }

@@ -22,9 +22,14 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { username: user.email, sub: user.id };
-    const token = this.jwtService.sign(payload);
+    const userData = { username: user.email, sub: user.id };
+    const token = this.jwtService.sign(userData);
     this.tokenService.save(token, user.email);
     return token;
+  }
+
+  async logout(userId: number) {
+    const token = await this.usersService.findTokenByUserId(userId);
+    return this.tokenService.delete(token.id);
   }
 }

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/users.create.dto';
 import { Users } from './dto/users.entity';
 import * as bcrypt from 'bcrypt';
+import { Token } from 'src/token/token.entity';
 
 @Injectable()
 export class UsersService {
@@ -41,10 +42,18 @@ export class UsersService {
   }
 
   async findOne(email: string): Promise<Users | undefined> {
-    return this.usersRepository.findOne({ where: { email: email } });
+    return this.usersRepository.findOne({
+      relations: { token: true },
+      where: { email: email },
+    });
   }
 
-  async delete(userId: number): Promise<void> {
-    await this.usersRepository.delete(userId);
+  async findTokenByUserId(userId: number): Promise<Token | undefined> {
+    const { token } = await this.usersRepository.findOne({
+      relations: { token: true },
+      where: { id: userId },
+    });
+
+    return token;
   }
 }

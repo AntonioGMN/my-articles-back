@@ -9,6 +9,8 @@ import { AuthService } from '../auth/auth.service';
 import { UsersService } from '../users/users.service';
 import { Repository } from 'typeorm';
 import { Token } from './token.entity';
+import { Users } from 'src/users/dto/users.entity';
+import { find } from 'rxjs';
 
 @Injectable()
 export class TokenService {
@@ -20,33 +22,36 @@ export class TokenService {
     private authService: AuthService,
   ) {}
 
-  async save(hash: string, username: string) {
-    const objToken = await this.tokenRepository.findOne({
-      where: { username: username },
+  async save(token: string, userEmail: string) {
+    const user = await this.userService.findOne(userEmail);
+
+    const findedToken = await this.tokenRepository.findOne({
+      relations: { user: true },
+      where: { user },
     });
 
-    if (objToken) {
-      this.tokenRepository.update(objToken.id, { hash: hash });
+    if (findedToken) {
+      this.tokenRepository.update(findedToken.id, { token: token });
     } else {
-      this.tokenRepository.insert({ hash: hash, username: username });
+      this.tokenRepository.insert({ token: token, user });
     }
   }
 
   async refreshToken(oldToken: string) {
-    const objToken = await this.tokenRepository.findOne({
-      where: { hash: oldToken },
+    console.log('entrou no refhes');
+    const findedToken = await this.tokenRepository.findOne({
+      relations: { user: true },
+      where: { token: oldToken },
     });
 
-    if (objToken) {
-      const user = await this.userService.findOne(objToken.username);
+    if (findedToken) {
+      const user = await this.userService.findOne(findedToken.user.email);
+      console.log('refresh');
       return this.authService.login(user);
     }
+  }
 
-    return new HttpException(
-      {
-        errorMessage: 'Token invalido',
-      },
-      HttpStatus.UNAUTHORIZED,
-    );
+  async delete(tokenId: number) {
+    return this.tokenRepository.delete(tokenId);
   }
 }

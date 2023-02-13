@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Users } from 'src/users/dto/users.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class Token {
@@ -6,8 +13,9 @@ export class Token {
   id: number;
 
   @Column({ length: 255 })
-  hash: string;
+  token: string;
 
-  @Column({ length: 100 })
-  username: string;
+  @OneToOne(() => Users, (user) => user.token)
+  @JoinColumn({ name: 'userId' })
+  user: Users;
 }
