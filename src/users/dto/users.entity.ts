@@ -22,9 +22,9 @@ export class Users {
   @Column({ length: 100 })
   password: string;
 
-  @OneToOne(() => Token, (Token) => Token.user)
+  @OneToOne(() => Token, (token) => token.user)
   token: Token;
 
-  @OneToMany(() => Articles, (Articles) => Articles.user)
+  @OneToMany(() => Articles, (articles) => articles.user)
   articles: Articles[];
 }

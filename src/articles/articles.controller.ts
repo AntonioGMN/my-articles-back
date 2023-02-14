@@ -33,7 +33,7 @@ export class ArticlesController {
   }
 
   @Put()
-  async update(@Body() body: CreateArticlesDto) {
+  async update(@Body() body) {
     console.log('incial article ', body);
     return this.articlesService.update(body);
   }

@@ -5,10 +5,10 @@ export class CreateUserDto {
   @IsNotEmpty()
   name: string;
 
-  @IsEmail()
-  @EmailIsUnique({ message: 'Já existe um usuário com este e-mail' })
+  @IsEmail({}, { message: 'Email invalido' })
+  @EmailIsUnique({ message: 'Já existe um usuário cadastrado com este e-mail' })
   email: string;
 
-  @MinLength(3)
+  @MinLength(3, { message: 'Senha precisa ter mais que 3 caracteres' })
   password: string;
 }

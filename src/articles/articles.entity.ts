@@ -1,5 +1,11 @@
 import { Users } from 'src/users/dto/users.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class Articles {
@@ -12,6 +18,6 @@ export class Articles {
   @Column({ length: 250 })
   url: string;
 
-  @ManyToOne(() => Users, (Users) => Users.articles)
+  @ManyToOne(() => Users, (user) => user.articles)
   user: Users;
 }

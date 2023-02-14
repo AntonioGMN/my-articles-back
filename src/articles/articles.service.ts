@@ -21,7 +21,7 @@ export class ArticlesService {
         relations: { user: true },
         where: { user: { id: userId } },
       });
-      console.log(articles);
+      //console.log(articles);
       const articlesWithMetaDates = Promise.all(
         articles.map(async (art) => {
           const { image } = await urlMetadata(art.url);
@@ -39,19 +39,23 @@ export class ArticlesService {
 
   async create(article: CreateArticlesDto): Promise<ResponseDto> {
     try {
-      console.log(article);
+      //console.log(article);
       const user = await this.userService.findOne(article.userEmail);
 
       delete article.userEmail;
-      const r = await this.articlesRepository.save({ ...article, user });
-      console.log(r);
+      const newArticle = this.articlesRepository.create({
+        ...article,
+        user: user,
+      });
+      console.log(newArticle);
+      await this.articlesRepository.save(newArticle);
 
       return <ResponseDto>{
         status: true,
         mensage: 'create',
       };
     } catch (err) {
-      console.log(err);
+      //console.log(err);
 
       return <ResponseDto>{
         status: false,

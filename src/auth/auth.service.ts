@@ -14,11 +14,14 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOne(email);
+    if (!user) return { type: 'error', message: 'Usuario não encontrado' };
+
     if (user && bcrypt.compareSync(password, user.password)) {
-      const { password, ...result } = user;
-      return result;
+      delete user.password;
+      return { type: 'success', data: user };
     }
-    return null;
+
+    return { type: 'error', message: 'Senha Incorreta' };
   }
 
   async login(user: any) {
