@@ -1,5 +1,5 @@
-import { Articles } from 'src/articles/articles.entity';
-import { Token } from 'src/token/token.entity';
+import { Articles } from '../../articles/articles.entity';
+import { Token } from '../../token/token.entity';
 import {
   Column,
   Entity,
@@ -25,6 +25,8 @@ export class Users {
   @OneToOne(() => Token, (token) => token.user)
   token: Token;
 
-  @OneToMany(() => Articles, (articles) => articles.user)
+  @OneToMany(() => Articles, (articles) => articles.user, {
+    cascade: true,
+  })
   articles: Articles[];
 }

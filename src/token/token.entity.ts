@@ -1,4 +1,4 @@
-import { Users } from 'src/users/dto/users.entity';
+import { Users } from '../users/dto/users.entity';
 import {
   Entity,
   Column,

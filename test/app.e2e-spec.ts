@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { CreateUserDto } from 'src/users/dto/users.create.dto';
+import { CreateUserDto } from '../src/users/dto/users.create.dto';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 describe('UsersController E2e TESTS', () => {
   let app: INestApplication;
@@ -16,8 +17,22 @@ describe('UsersController E2e TESTS', () => {
   let token: string;
 
   beforeEach(async () => {
+    console.log(process.env.DB_DATABASE);
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        AppModule,
+        TypeOrmModule.forRoot({
+          type: 'mysql',
+          host: process.env.DB_HOST,
+          port: parseInt(process.env.DB_PORT),
+          username: process.env.DB_USERNAME,
+          password: process.env.DB_PASSWORD,
+          database: process.env.DB_DATABASE,
+          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+          synchronize: true,
+        }),
+      ],
     }).compile();
 
     app = moduleFixture.createNestApplication();

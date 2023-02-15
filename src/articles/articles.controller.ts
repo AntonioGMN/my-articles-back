@@ -7,7 +7,7 @@ import {
   Put,
   Body,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
+import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { ArticlesService } from './articles.service';
 import { CreateArticlesDto } from './dto/articles.create.dto';
 
@@ -18,8 +18,8 @@ export class ArticlesController {
 
   @Get()
   async getByUserId(@Req() req) {
-    const { userId } = req.user;
-    return this.articlesService.getByUserId(userId);
+    const { email } = req.user;
+    return this.articlesService.getByUser(email);
   }
 
   @Post('/create')

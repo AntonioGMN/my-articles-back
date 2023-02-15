@@ -1,11 +1,11 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import puppeteer from 'puppeteer';
-import { ResponseDto } from 'src/dto/response.dto';
+import { ResponseDto } from '../dto/response.dto';
 import { Repository } from 'typeorm';
 import { CreateArticlesDto } from './dto/articles.create.dto';
 import { Articles } from './articles.entity';
 import urlMetadata from 'url-metadata';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ArticlesService {
@@ -15,13 +15,15 @@ export class ArticlesService {
     private userService: UsersService,
   ) {}
 
-  async getByUserId(userId: number) {
+  async getByUser(userEmail: string) {
+    const user = await this.userService.findOne(userEmail);
+
     try {
       const articles = await this.articlesRepository.find({
         relations: { user: true },
-        where: { user: { id: userId } },
+        where: { user: user },
       });
-      //console.log(articles);
+
       const articlesWithMetaDates = Promise.all(
         articles.map(async (art) => {
           const { image } = await urlMetadata(art.url);
@@ -39,7 +41,6 @@ export class ArticlesService {
 
   async create(article: CreateArticlesDto): Promise<ResponseDto> {
     try {
-      //console.log(article);
       const user = await this.userService.findOne(article.userEmail);
 
       delete article.userEmail;
@@ -47,7 +48,6 @@ export class ArticlesService {
         ...article,
         user: user,
       });
-      console.log(newArticle);
       await this.articlesRepository.save(newArticle);
 
       return <ResponseDto>{
@@ -55,8 +55,6 @@ export class ArticlesService {
         mensage: 'create',
       };
     } catch (err) {
-      //console.log(err);
-
       return <ResponseDto>{
         status: false,
         mensage: err,
@@ -70,7 +68,6 @@ export class ArticlesService {
         article.id,
         article,
       );
-      console.log(response);
       return <ResponseDto>{
         status: true,
         mensage: 'create',
@@ -100,7 +97,9 @@ export class ArticlesService {
       browser.close();
 
       return links;
-    } catch (err) {}
+    } catch (err) {
+      return err;
+    }
   }
 
   async postCrawler({ userEmail, url }) {

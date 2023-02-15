@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsNumber, IsUrl } from 'class-validator';
-import { Users } from 'src/users/dto/users.entity';
 
 export class CreateArticlesDto {
   @IsNumber()
