@@ -22,7 +22,7 @@ export class Users {
   @Column({ length: 100 })
   password: string;
 
-  @OneToOne(() => Token, (token) => token.user)
+  @OneToOne(() => Token, (token) => token.user, { onDelete: 'CASCADE' })
   token: Token;
 
   @OneToMany(() => Articles, (articles) => articles.user, {

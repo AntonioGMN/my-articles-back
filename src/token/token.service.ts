@@ -15,33 +15,32 @@ export class TokenService {
   ) {}
 
   async save(token: string, userEmail: string) {
-    const user = await this.userService.findOne(userEmail);
+    try {
+      const user = await this.userService.findOne(userEmail);
 
-    const findedToken = await this.tokenRepository.findOne({
-      relations: { user: true },
-      where: { user },
-    });
+      const findedToken = await this.tokenRepository.findOne({
+        relations: { user: true },
+        where: { user },
+      });
 
-    if (findedToken) {
-      this.tokenRepository.update(findedToken.id, { token: token });
-    } else {
-      this.tokenRepository.insert({ token: token, user });
+      if (findedToken) {
+        this.tokenRepository.update(findedToken.id, { token: token });
+      } else {
+        this.tokenRepository.insert({ token: token, user });
+      }
+    } catch (err) {
+      return err;
     }
   }
 
-  async refreshToken(oldToken: string) {
-    console.log(oldToken);
-
+  async refreshToken(oldToken: string): Promise<string | null> {
     const findedToken = await this.tokenRepository.findOne({
       relations: { user: true },
       where: { token: oldToken },
     });
 
-    console.log(findedToken);
-
     if (findedToken) {
       const user = await this.userService.findOne(findedToken.user.email);
-
       return await this.authService.login(user);
     }
   }

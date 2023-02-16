@@ -4,6 +4,13 @@ import { ConfigModule } from '@nestjs/config';
 import { ArticlesModule } from './articles/articles.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, ArticlesModule],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: ['.env', '.env.test'],
+      isGlobal: true,
+    }),
+    AuthModule,
+    ArticlesModule,
+  ],
 })
 export class AppModule {}

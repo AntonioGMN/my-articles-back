@@ -39,11 +39,13 @@ export class ArticlesService {
     }
   }
 
-  async create(article: CreateArticlesDto): Promise<ResponseDto> {
+  async create(
+    article: CreateArticlesDto,
+    userEmail: string,
+  ): Promise<ResponseDto> {
     try {
-      const user = await this.userService.findOne(article.userEmail);
+      const user = await this.userService.findOne(userEmail);
 
-      delete article.userEmail;
       const newArticle = this.articlesRepository.create({
         ...article,
         user: user,
@@ -62,15 +64,12 @@ export class ArticlesService {
     }
   }
 
-  async update(article: CreateArticlesDto): Promise<ResponseDto> {
+  async update(article: Articles): Promise<ResponseDto> {
     try {
-      const response = await this.articlesRepository.update(
-        article.id,
-        article,
-      );
+      await this.articlesRepository.update(article.id, article);
       return <ResponseDto>{
         status: true,
-        mensage: 'create',
+        mensage: 'updated',
       };
     } catch (err) {
       return <ResponseDto>{

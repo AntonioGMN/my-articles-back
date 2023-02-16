@@ -42,8 +42,15 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Delete('logout')
-  async delete(@Request() req) {
+  async logout(@Request() req) {
     const { userId } = req.user;
     return await this.authService.logout(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('delete')
+  async delete(@Request() req) {
+    const { userId } = req.user;
+    return await this.userService.delete(userId);
   }
 }

@@ -12,6 +12,6 @@ export class Articles {
   @Column({ length: 250 })
   url: string;
 
-  @ManyToOne(() => Users, (user) => user.articles)
+  @ManyToOne(() => Users, (user) => user.articles, { onDelete: 'CASCADE' })
   user: Users;
 }

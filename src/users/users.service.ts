@@ -56,4 +56,8 @@ export class UsersService {
 
     return token;
   }
+
+  async delete(userId: number) {
+    return await this.usersRepository.delete(userId);
+  }
 }

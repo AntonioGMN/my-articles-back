@@ -25,10 +25,14 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const userData = { username: user.email, sub: user.id };
-    const token = this.jwtService.sign(userData);
-    this.tokenService.save(token, user.email);
-    return token;
+    try {
+      const userData = { username: user.email, sub: user.id };
+      const token = this.jwtService.sign(userData);
+      await this.tokenService.save(token, user.email);
+      return token;
+    } catch (err) {
+      return err;
+    }
   }
 
   async logout(userId: number) {

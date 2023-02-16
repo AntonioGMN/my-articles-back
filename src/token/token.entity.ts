@@ -15,7 +15,7 @@ export class Token {
   @Column({ length: 255 })
   token: string;
 
-  @OneToOne(() => Users, (user) => user.token)
+  @OneToOne(() => Users, (user) => user.token, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: Users;
 }
